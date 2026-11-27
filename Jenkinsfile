@@ -10,7 +10,7 @@ pipeline {
     }
 
     environment {
-        // Jenkins credential of type "SSH Username with private key" or "Secret file" holding the .pem key
+        // Jenkins credential (Secret file) holding the .pem key
         SSH_KEY_ID = 'ec2-ssh-key'
     }
 
@@ -34,6 +34,12 @@ pipeline {
             }
         }
 
+        stage('Deploy (Local)') {
+            steps {
+                sh 'bash scripts/deploy-local.sh'
+            }
+        }
+
         stage('Deploy to EC2') {
             when { expression { return params.EC2_HOST?.trim() } }
             steps {
@@ -48,7 +54,7 @@ pipeline {
     }
 
     post {
-        success { echo "Pipeline succeeded. Website live at http://${params.EC2_HOST}" }
+        success { echo 'Pipeline succeeded.' }
         failure { echo 'Pipeline failed. Check the stage logs above.' }
     }
 }
